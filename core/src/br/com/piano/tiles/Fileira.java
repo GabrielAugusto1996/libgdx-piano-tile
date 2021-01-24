@@ -8,7 +8,7 @@ import static br.com.piano.tiles.CorConstants.ERRADO;
 import static br.com.piano.tiles.CorConstants.VERDE;
 import static br.com.piano.tiles.GameConstants.TILE_HEIGHT;
 import static br.com.piano.tiles.GameConstants.TILE_WIDTH;
-import static br.com.piano.tiles.GameConstants.VELOCIDADE_ATUAL;
+import static br.com.piano.tiles.GameConstants.velocidadeAtual;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
@@ -75,7 +75,7 @@ public class Fileira {
     }
 
     public int update(final float time) {
-        y -= time * VELOCIDADE_ATUAL;
+        y -= time * velocidadeAtual;
 
         if (y < 0 - TILE_HEIGHT) {
             if (ok) {

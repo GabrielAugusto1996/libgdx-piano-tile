@@ -12,6 +12,6 @@ public class GameConstants {
     public static final int TILE_WIDTH = SCREEN_X / 4;
     public static final int TILE_HEIGHT = SCREEN_Y / 4;
 
-    public static final float VELOCIDADE_INICIAL = 2 * TILE_HEIGHT / 1f;
-    public static float VELOCIDADE_ATUAL = 0f;
+    public static float velocidadeInicial = 2 * TILE_HEIGHT / 1f;
+    public static float velocidadeAtual = 0f;
 }

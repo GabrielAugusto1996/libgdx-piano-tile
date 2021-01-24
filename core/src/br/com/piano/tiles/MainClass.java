@@ -2,9 +2,13 @@ package br.com.piano.tiles;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.util.ArrayList;
@@ -14,9 +18,8 @@ import java.util.Random;
 import static br.com.piano.tiles.GameConstants.SCREEN_X;
 import static br.com.piano.tiles.GameConstants.SCREEN_Y;
 import static br.com.piano.tiles.GameConstants.TILE_HEIGHT;
-import static br.com.piano.tiles.GameConstants.TILE_WIDTH;
-import static br.com.piano.tiles.GameConstants.VELOCIDADE_ATUAL;
-import static br.com.piano.tiles.GameConstants.VELOCIDADE_INICIAL;
+import static br.com.piano.tiles.GameConstants.velocidadeAtual;
+import static br.com.piano.tiles.GameConstants.velocidadeInicial;
 import static java.lang.Boolean.TRUE;
 
 public class MainClass extends ApplicationAdapter {
@@ -33,6 +36,9 @@ public class MainClass extends ApplicationAdapter {
     private Texture textIniciar;
     private Piano piano;
 
+    private BitmapFont fonte;
+    private GlyphLayout glyphLayout;
+
     @Override
     public void create() {
         shapeRenderer = new ShapeRenderer();
@@ -47,6 +53,19 @@ public class MainClass extends ApplicationAdapter {
         textIniciar = new Texture("iniciar.png");
 
         piano = new Piano("natal");
+
+        glyphLayout = new GlyphLayout();
+
+        FreeTypeFontGenerator.setMaxTextureSize(2048);
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("font.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+
+        parameter.size = (int) (0.1f * SCREEN_Y);
+        parameter.color = Color.BLACK;
+
+        fonte = generator.generateFont(parameter);
+
+        generator.dispose();
 
         iniciar();
     }
@@ -67,13 +86,15 @@ public class MainClass extends ApplicationAdapter {
 
         shapeRenderer.end();
 
+        spriteBatch.begin();
+
         if (estado == 0) {
-            spriteBatch.begin();
-
             spriteBatch.draw(textIniciar, 0, TILE_HEIGHT / 4, SCREEN_X, TILE_HEIGHT / 2);
-
-            spriteBatch.end();
         }
+
+        fonte.draw(spriteBatch, String.valueOf(pontos), 0, SCREEN_Y);
+
+        spriteBatch.end();
     }
 
     private void input() {
@@ -124,7 +145,7 @@ public class MainClass extends ApplicationAdapter {
         if (estado == 1) {
             tempoTotal += deltaTime;
 
-            VELOCIDADE_ATUAL = VELOCIDADE_INICIAL + TILE_HEIGHT * tempoTotal / 8f;
+            velocidadeAtual = velocidadeInicial + TILE_HEIGHT * tempoTotal / 8f;
 
             for (int i = 0; i < fileiras.size(); i++) {
                 final int retorno = fileiras.get(i).update(deltaTime);
@@ -171,7 +192,16 @@ public class MainClass extends ApplicationAdapter {
 
         estado = 0;
 
+        velocidadeAtual = 0f;
+
         piano.reset();
+    }
+
+    private float getWidth(final BitmapFont font, final String texto) {
+        glyphLayout.reset();
+        glyphLayout.setText(font, texto);
+
+        return glyphLayout.width;
     }
 
     @Override
