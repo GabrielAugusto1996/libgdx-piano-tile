@@ -70,7 +70,7 @@ public class MainClass extends ApplicationAdapter {
                             pontos++;
                             indexInferior++;
                         } else if (retorno == 1) {
-                            // Encerrar o jogo da forma 1
+                            fileiras.get(indexInferior).error();
                             finalizar(0);
                         } else {
                             // Encerrar o jogo da forma 2
@@ -105,6 +105,7 @@ public class MainClass extends ApplicationAdapter {
 
             for (int i = 0; i < fileiras.size(); i++) {
                 final int retorno = fileiras.get(i).update(deltaTime);
+                fileiras.get(1).animacao(deltaTime);
 
                 if (retorno != 0) {
                     if (retorno == 1) {
@@ -117,6 +118,10 @@ public class MainClass extends ApplicationAdapter {
                         finalizar(1);
                     }
                 }
+            }
+        } else if (estado == 2) {
+            for (final Fileira f : fileiras) {
+                f.animacao(deltaTime);
             }
         }
     }

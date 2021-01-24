@@ -3,6 +3,8 @@ package br.com.piano.tiles;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
+import static br.com.piano.tiles.CorConstants.CERTO;
+import static br.com.piano.tiles.CorConstants.ERRADO;
 import static br.com.piano.tiles.CorConstants.VERDE;
 import static br.com.piano.tiles.GameConstants.TILE_HEIGHT;
 import static br.com.piano.tiles.GameConstants.TILE_WIDTH;
@@ -20,10 +22,15 @@ public class Fileira {
 
     private boolean ok;
 
+    private boolean destruir;
+    private float animacao;
+
     public Fileira(float y, int correta) {
         this.y = y;
         this.correta = correta;
-        this.ok = FALSE;
+        ok = FALSE;
+        destruir = FALSE;
+        animacao = 0;
     }
 
     public float getY() {
@@ -48,6 +55,17 @@ public class Fileira {
 
         shapeRenderer.rect(correta * TILE_WIDTH, y, TILE_WIDTH, TILE_HEIGHT);
 
+        if (destruir) {
+            if (ok) {
+                shapeRenderer.setColor(CERTO);
+            } else {
+                shapeRenderer.setColor(ERRADO);
+            }
+
+            shapeRenderer.rect(posicao * TILE_WIDTH +  (TILE_WIDTH - animacao * TILE_WIDTH) / 2f, y + (TILE_HEIGHT - animacao * TILE_HEIGHT) / 2f,
+                    animacao * TILE_WIDTH, animacao * TILE_HEIGHT);
+        }
+
         shapeRenderer.set(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Color.GRAY);
 
@@ -63,6 +81,7 @@ public class Fileira {
             if (ok) {
                 return 1;
             } else {
+                error();
                 return 2;
             }
         }
@@ -76,13 +95,30 @@ public class Fileira {
 
             if (posicao == correta) {
                 ok = TRUE;
+                destruir = TRUE;
                 return 1;
             } else {
                 ok = FALSE;
+                destruir = TRUE;
                 return 2;
             }
         }
 
         return 0;
+    }
+
+    public void animacao(final float time) {
+        if (destruir && animacao < 1) {
+            animacao += 5 * time;
+
+            if (animacao >= 1) {
+                animacao = 1;
+            }
+        }
+    }
+
+    public void error() {
+        destruir = TRUE;
+        posicao = correta;
     }
 }
