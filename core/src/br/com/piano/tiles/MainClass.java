@@ -11,12 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static br.com.piano.tiles.GameConstants.TILE_HEIGHT;
+import static br.com.piano.tiles.GameConstants.VELOCIDADE_ATUAL;
+import static br.com.piano.tiles.GameConstants.VELOCIDADE_INICIAL;
 import static java.lang.Boolean.TRUE;
 
 public class MainClass extends ApplicationAdapter {
 
 	private ShapeRenderer shapeRenderer;
 	private List<Fileira> fileiras;
+	private float tempoTotal;
 
 	@Override
 	public void create () {
@@ -28,10 +31,14 @@ public class MainClass extends ApplicationAdapter {
 		fileiras.add(new Fileira(0, 0));
 		fileiras.add(new Fileira(TILE_HEIGHT, 1));
 		fileiras.add(new Fileira(2 * TILE_HEIGHT, 2));
+
+		tempoTotal = 0;
 	}
 
 	@Override
 	public void render () {
+		update(Gdx.graphics.getDeltaTime());
+
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -42,6 +49,16 @@ public class MainClass extends ApplicationAdapter {
 		}
 
 		shapeRenderer.end();
+	}
+
+	private void update(final float deltaTime) {
+		tempoTotal += deltaTime;
+
+		VELOCIDADE_ATUAL = VELOCIDADE_INICIAL + TILE_HEIGHT * tempoTotal / 8f;
+
+		for (final Fileira fileira : fileiras) {
+			fileira.update(deltaTime);
+		}
 	}
 	
 	@Override

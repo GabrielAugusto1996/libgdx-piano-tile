@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import static br.com.piano.tiles.CorConstants.VERDE;
 import static br.com.piano.tiles.GameConstants.TILE_HEIGHT;
 import static br.com.piano.tiles.GameConstants.TILE_WIDTH;
+import static br.com.piano.tiles.GameConstants.VELOCIDADE_ATUAL;
 
 public class Fileira {
 
@@ -46,5 +47,9 @@ public class Fileira {
         for (int i = 0; i <= 3; i++) {
             shapeRenderer.rect(i * TILE_WIDTH, y, TILE_WIDTH, TILE_HEIGHT);
         }
+    }
+
+    public void update(final float time) {
+        y -= time * VELOCIDADE_ATUAL;
     }
 }
