@@ -3,14 +3,18 @@ package br.com.piano.tiles;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static br.com.piano.tiles.GameConstants.SCREEN_X;
 import static br.com.piano.tiles.GameConstants.SCREEN_Y;
 import static br.com.piano.tiles.GameConstants.TILE_HEIGHT;
+import static br.com.piano.tiles.GameConstants.TILE_WIDTH;
 import static br.com.piano.tiles.GameConstants.VELOCIDADE_ATUAL;
 import static br.com.piano.tiles.GameConstants.VELOCIDADE_INICIAL;
 import static java.lang.Boolean.TRUE;
@@ -18,21 +22,31 @@ import static java.lang.Boolean.TRUE;
 public class MainClass extends ApplicationAdapter {
 
     private ShapeRenderer shapeRenderer;
+    private SpriteBatch spriteBatch;
+
     private List<Fileira> fileiras;
     private float tempoTotal;
     private int indexInferior;
     private int pontos;
     private Random random;
     private int estado;
+    private Texture textIniciar;
+    private Piano piano;
 
     @Override
     public void create() {
         shapeRenderer = new ShapeRenderer();
         shapeRenderer.setAutoShapeType(TRUE);
 
+        spriteBatch = new SpriteBatch();
+
         fileiras = new ArrayList<>();
 
         random = new Random();
+
+        textIniciar = new Texture("iniciar.png");
+
+        piano = new Piano("natal");
 
         iniciar();
     }
@@ -52,6 +66,14 @@ public class MainClass extends ApplicationAdapter {
         }
 
         shapeRenderer.end();
+
+        if (estado == 0) {
+            spriteBatch.begin();
+
+            spriteBatch.draw(textIniciar, 0, TILE_HEIGHT / 4, SCREEN_X, TILE_HEIGHT / 2);
+
+            spriteBatch.end();
+        }
     }
 
     private void input() {
@@ -69,6 +91,7 @@ public class MainClass extends ApplicationAdapter {
                         if (retorno == 1 && i == indexInferior) {
                             pontos++;
                             indexInferior++;
+                            piano.tocar();
                         } else if (retorno == 1) {
                             fileiras.get(indexInferior).error();
                             finalizar(0);
@@ -81,8 +104,8 @@ public class MainClass extends ApplicationAdapter {
                     }
                 }
             } else if (estado == 2) {
-            	iniciar();
-			}
+                iniciar();
+            }
         }
     }
 
@@ -147,10 +170,14 @@ public class MainClass extends ApplicationAdapter {
         adicionar();
 
         estado = 0;
+
+        piano.reset();
     }
 
     @Override
     public void dispose() {
         shapeRenderer.dispose();
+        spriteBatch.dispose();
+        piano.dispose();
     }
 }
