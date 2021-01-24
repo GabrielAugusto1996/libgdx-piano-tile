@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static br.com.piano.tiles.GameConstants.SCREEN_Y;
 import static br.com.piano.tiles.GameConstants.TILE_HEIGHT;
@@ -21,6 +22,8 @@ public class MainClass extends ApplicationAdapter {
     private float tempoTotal;
     private int indexInferior;
     private int pontos;
+    private Random random;
+    private int estado;
 
     @Override
     public void create() {
@@ -29,14 +32,9 @@ public class MainClass extends ApplicationAdapter {
 
         fileiras = new ArrayList<>();
 
-        fileiras.add(new Fileira(0, 0));
-        fileiras.add(new Fileira(TILE_HEIGHT, 1));
-        fileiras.add(new Fileira(2 * TILE_HEIGHT, 2));
+        random = new Random();
 
-        tempoTotal = 0;
-        indexInferior = 0;
-
-        pontos = 0;
+        iniciar();
     }
 
     @Override
@@ -61,49 +59,89 @@ public class MainClass extends ApplicationAdapter {
             final int x = Gdx.input.getX();
             final int y = SCREEN_Y - Gdx.input.getY();
 
-            for (int i = 0; i < fileiras.size(); i++) {
-                final int retorno = fileiras.get(i).toque(x, y);
+            if (estado == 0) {
+                estado = 1;
+            } else if (estado == 1) {
+                for (int i = 0; i < fileiras.size(); i++) {
+                    final int retorno = fileiras.get(i).toque(x, y);
 
-                if (retorno != 0) {
-                    if (retorno == 1 && i == indexInferior) {
-                        pontos++;
-                        indexInferior++;
-                    } else if (retorno == 1) {
-                        // Encerrar o jogo da forma 1
-                        finalizar();
-                    } else {
-                        // Encerrar o jogo da forma 2
-                        finalizar();
+                    if (retorno != 0) {
+                        if (retorno == 1 && i == indexInferior) {
+                            pontos++;
+                            indexInferior++;
+                        } else if (retorno == 1) {
+                            // Encerrar o jogo da forma 1
+                            finalizar(0);
+                        } else {
+                            // Encerrar o jogo da forma 2
+                            finalizar(0);
+                        }
+
+                        break;
                     }
-
-                    break;
                 }
-            }
+            } else if (estado == 2) {
+            	iniciar();
+			}
         }
     }
 
-    private void finalizar() {
+    private void finalizar(final int opcao) {
         Gdx.input.vibrate(200);
+        estado = 2;
+
+        if (opcao == 1) {
+            for (final Fileira fileira : fileiras) {
+                fileira.setY(fileira.getY() + TILE_HEIGHT);
+            }
+        }
     }
 
     private void update(final float deltaTime) {
-        tempoTotal += deltaTime;
+        if (estado == 1) {
+            tempoTotal += deltaTime;
 
-        VELOCIDADE_ATUAL = VELOCIDADE_INICIAL + TILE_HEIGHT * tempoTotal / 8f;
+            VELOCIDADE_ATUAL = VELOCIDADE_INICIAL + TILE_HEIGHT * tempoTotal / 8f;
 
-        for (int i = 0; i < fileiras.size(); i++) {
-            final int retorno = fileiras.get(i).update(deltaTime);
+            for (int i = 0; i < fileiras.size(); i++) {
+                final int retorno = fileiras.get(i).update(deltaTime);
 
-            if (retorno != 0) {
-                if (retorno == 1) {
-                    fileiras.remove(i);
-                    i--;
-                    indexInferior--;
+                if (retorno != 0) {
+                    if (retorno == 1) {
+                        fileiras.remove(i);
+                        i--;
+                        indexInferior--;
 
-                    adicionar();
+                        adicionar();
+                    } else if (retorno == 2) {
+                        finalizar(1);
+                    }
                 }
             }
         }
+    }
+
+    private void adicionar() {
+        final float y = fileiras.get(fileiras.size() - 1).getY() + TILE_HEIGHT;
+
+        fileiras.add(new Fileira(y, random.nextInt(4)));
+    }
+
+    private void iniciar() {
+        tempoTotal = 0;
+        indexInferior = 0;
+        pontos = 0;
+
+        fileiras.clear();
+
+        fileiras.add(new Fileira(TILE_HEIGHT, random.nextInt(4)));
+
+        adicionar();
+        adicionar();
+        adicionar();
+        adicionar();
+
+        estado = 0;
     }
 
     @Override
